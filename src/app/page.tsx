@@ -96,6 +96,17 @@ export default function Home() {
     }
   };
 
+  const getDashboardUrl = () => {
+    const params = new URLSearchParams();
+    if (query) params.set('q', query);
+    if (location) params.set('l', location);
+    if (dateFilter) params.set('d', dateFilter);
+    if (workType) params.set('w', workType);
+    if (industry) params.set('i', industry);
+    if (radius) params.set('r', radius);
+    return `/work-search?${params.toString()}`;
+  };
+
   const getPostingStyle = (postedDate: string) => {
     const lower = postedDate.toLowerCase();
     if (lower.includes('hour') || lower.includes('today') || lower.includes('just')) {
@@ -439,7 +450,7 @@ export default function Home() {
                   {loading ? 'Searching...' : jobs.length > 0 ? `Results (${jobs.length})` : 'No jobs found'}
                 </Typography>
                 {jobs.length > 0 && (
-                   <Button component={Link} href="/work-search" endIcon={<ArrowForwardIcon />} sx={{ fontWeight: 700 }}>
+                   <Button component={Link} href={getDashboardUrl()} endIcon={<ArrowForwardIcon />} sx={{ fontWeight: 700 }}>
                      Enter Full Dashboard
                    </Button>
                 )}
@@ -509,7 +520,7 @@ export default function Home() {
                                variant="outlined" 
                                fullWidth 
                                component={Link}
-                               href={`/work-search`}
+                               href={getDashboardUrl()}
                                sx={{ 
                                  borderRadius: 2, 
                                  py: 1.2, 
@@ -572,7 +583,7 @@ export default function Home() {
            <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 600, mx: 'auto' }}>
              Log in to track your applications, earn points, and get personalized AI follow-up suggestions for every job.
            </Typography>
-           <Button variant="contained" size="large" component={Link} href="/work-search" sx={{ px: 6, py: 2, borderRadius: 4, fontSize: '1.1rem', fontWeight: 800 }}>
+           <Button variant="contained" size="large" component={Link} href={getDashboardUrl()} sx={{ px: 6, py: 2, borderRadius: 4, fontSize: '1.1rem', fontWeight: 800 }}>
              Open Career Dashboard
            </Button>
         </Box>

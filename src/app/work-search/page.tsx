@@ -5,7 +5,7 @@ import {
   Box, Typography, TextField, Button, Card, CardContent, Chip, 
   InputAdornment, Snackbar, Alert, Collapse, Divider,
   Stack, Paper, Skeleton, Fade, Grow, ToggleButtonGroup, ToggleButton, Autocomplete,
-  Select, MenuItem, FormControl, InputLabel, Badge
+  Select, MenuItem, FormControl, InputLabel, Badge, CircularProgress
 } from '@mui/material';
 import WorkIcon from '@mui/icons-material/Work';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -25,6 +25,8 @@ import Link from 'next/link';
 import { searchJobs, applyToJob, Job } from '../../lib/linkedin';
 import { useAuth } from '../../lib/auth';
 import { saveApplication, hasApplied, getApplicationStats } from '../../lib/applications';
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
 // Points per application
 const POINTS_PER_APPLICATION = 25;
@@ -83,20 +85,22 @@ export const POPULAR_LOCATIONS = [
   'Remote Worldwide',
 ];
 
-export default function WorkSearchPage() {
+function SearchContent() {
   const { user } = useAuth();
-  const [query, setQuery] = useState('');
-  const [location, setLocation] = useState('Minnesota');
+  const searchParams = useSearchParams();
+  
+  const [query, setQuery] = useState(searchParams.get('q') || '');
+  const [location, setLocation] = useState(searchParams.get('l') || 'Minnesota');
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{open: boolean, message: string, severity: 'success' | 'info'}>({open: false, message: '', severity: 'success'});
   const [expandedJob, setExpandedJob] = useState<string | null>(null);
   
   // Filters
-  const [dateFilter, setDateFilter] = useState('week');
-  const [workType, setWorkType] = useState('any');
-  const [industry, setIndustry] = useState('all');
-  const [radius, setRadius] = useState('50');
+  const [dateFilter, setDateFilter] = useState(searchParams.get('d') || 'week');
+  const [workType, setWorkType] = useState(searchParams.get('w') || 'any');
+  const [industry, setIndustry] = useState(searchParams.get('i') || 'all');
+  const [radius, setRadius] = useState(searchParams.get('r') || '50');
   
   // Application tracking & rewards
   const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
@@ -108,6 +112,36 @@ export default function WorkSearchPage() {
   const [relatedJobs, setRelatedJobs] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(true);
   const [alternativeJobs, setAlternativeJobs] = useState<string[]>([]);
+
+  // Initial search from URL params
+  useEffect(() => {
+    if (searchParams.get('q')) {
+      handleSearchInternal();
+    }
+  }, []);
+
+  const handleSearchInternal = async () => {
+    setLoading(true);
+    try {
+      const q = searchParams.get('q') || query;
+      const l = searchParams.get('l') || location;
+      const d = searchParams.get('d') || dateFilter;
+      const w = searchParams.get('w') || workType;
+      const r = searchParams.get('r') || radius;
+      const i = searchParams.get('i') || industry;
+
+      const searchQuery = i !== 'all' 
+        ? `${q} ${INDUSTRIES.find(ind => ind.value === i)?.label.replace(/[^a-zA-Z ]/g, '') || ''}`.trim()
+        : q;
+      
+      const results = await searchJobs(searchQuery, l, d, w, r);
+      setJobs(results);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const saved = localStorage.getItem('jobApplications');
@@ -1010,5 +1044,13 @@ export default function WorkSearchPage() {
         </Alert>
       </Snackbar>
     </Box>
+  );
+}
+
+export default function WorkSearchPage() {
+  return (
+    <Suspense fallback={<Box sx={{ p: 8, textAlign: 'center' }}><CircularProgress /></Box>}>
+      <SearchContent />
+    </Suspense>
   );
 }
