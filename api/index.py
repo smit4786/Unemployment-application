@@ -44,7 +44,7 @@ def search_jobs(
     elif work_type == "onsite":
         work_type_query = " on-site"
     
-    params = {
+    base_params = {
         "engine": "google_jobs",
         "q": f"{q}{work_type_query} {loc}",
         "hl": "en",
@@ -59,103 +59,119 @@ def search_jobs(
         "month": "date_posted:month"
     }
     if date_filter in date_chips:
-        params["chips"] = date_chips[date_filter]
+        base_params["chips"] = date_chips[date_filter]
 
     try:
-        response = requests.get(url, params=params, timeout=15)
-        response.raise_for_status()
-        data = response.json()
+        all_jobs = []
+        seen_ids = set()
         
-        jobs_list = data.get("jobs_results", [])
-        normalized = []
+        # Fetch 3 pages of results (each page ~10 jobs = 30-50 total)
+        for page in range(3):
+            params = base_params.copy()
+            if page > 0:
+                params["start"] = page * 10  # Google Jobs pagination
+            
+            response = requests.get(url, params=params, timeout=15)
+            response.raise_for_status()
+            data = response.json()
+            
+            jobs_list = data.get("jobs_results", [])
+            if not jobs_list:
+                break  # No more results
+            
+            for job in jobs_list:
+                job_id = job.get("job_id", "")
+                if job_id in seen_ids:
+                    continue  # Skip duplicates
+                seen_ids.add(job_id)
+                
+                extensions = job.get("detected_extensions", {})
+                
+                # Extract rich details
+                posted_at = extensions.get("posted_at", "Recently")
+                salary = extensions.get("salary", None)
+                schedule_type = extensions.get("schedule_type", None)
+                work_from_home = extensions.get("work_from_home", False)
+                job_type = None
+                
+                # Parse schedule to determine job type
+                if schedule_type:
+                    job_type = schedule_type
+                elif "Full-time" in str(job.get("extensions", [])):
+                    job_type = "Full-time"
+                elif "Part-time" in str(job.get("extensions", [])):
+                    job_type = "Part-time"
+                elif "Contract" in str(job.get("extensions", [])):
+                    job_type = "Contract"
+                
+                # Calculate posting freshness score (lower = more recent)
+                freshness_score = 100
+                posted_lower = posted_at.lower()
+                if "hour" in posted_lower:
+                    freshness_score = 1
+                elif "today" in posted_lower or "just" in posted_lower:
+                    freshness_score = 2
+                elif "1 day" in posted_lower or "yesterday" in posted_lower:
+                    freshness_score = 3
+                elif "2 day" in posted_lower:
+                    freshness_score = 4
+                elif "3 day" in posted_lower:
+                    freshness_score = 5
+                elif "day" in posted_lower:
+                    freshness_score = 10
+                elif "week" in posted_lower:
+                    freshness_score = 20
+                
+                # Get apply link
+                apply_options = job.get("apply_options", [])
+                apply_url = apply_options[0].get("link") if apply_options else job.get("share_link")
+                
+                # Get all apply sources
+                apply_sources = [opt.get("title", "Apply") for opt in apply_options[:3]] if apply_options else []
+                
+                # Build highlights from extensions
+                highlights = job.get("job_highlights", [])
+                qualifications = []
+                benefits = []
+                responsibilities = []
+                
+                for highlight in highlights:
+                    title = highlight.get("title", "").lower()
+                    items = highlight.get("items", [])
+                    if "qualif" in title or "require" in title:
+                        qualifications = items[:5]
+                    elif "benefit" in title:
+                        benefits = items[:5]
+                    elif "responsib" in title or "duties" in title:
+                        responsibilities = items[:3]
+                
+                all_jobs.append({
+                    "id": job.get("job_id", "N/A"),
+                    "title": job.get("title", "Unknown Role"),
+                    "company": job.get("company_name", "Unknown Company"),
+                    "location": job.get("location", loc),
+                    "postedDate": posted_at,
+                    "freshnessScore": freshness_score,
+                    "easyApply": len(apply_options) > 0,
+                    "description": job.get("description", "View details.")[:800],
+                    "url": apply_url,
+                    "logoUrl": job.get("thumbnail"),
+                    # Enhanced details
+                    "salary": salary,
+                    "jobType": job_type,
+                    "workFromHome": work_from_home,
+                    "applySources": apply_sources,
+                    "qualifications": qualifications,
+                    "benefits": benefits,
+                    "responsibilities": responsibilities,
+                    "via": job.get("via", "")
+                })
         
-        for job in jobs_list[:15]:  # Increased to 15 results
-            extensions = job.get("detected_extensions", {})
+        # Sort by freshness (most recent first) and limit to 50
+        all_jobs.sort(key=lambda x: x["freshnessScore"])
+        final_jobs = all_jobs[:50]
             
-            # Extract rich details
-            posted_at = extensions.get("posted_at", "Recently")
-            salary = extensions.get("salary", None)
-            schedule_type = extensions.get("schedule_type", None)
-            work_from_home = extensions.get("work_from_home", False)
-            job_type = None
-            
-            # Parse schedule to determine job type
-            if schedule_type:
-                job_type = schedule_type
-            elif "Full-time" in str(job.get("extensions", [])):
-                job_type = "Full-time"
-            elif "Part-time" in str(job.get("extensions", [])):
-                job_type = "Part-time"
-            elif "Contract" in str(job.get("extensions", [])):
-                job_type = "Contract"
-            
-            # Calculate posting freshness score (lower = more recent)
-            freshness_score = 100
-            posted_lower = posted_at.lower()
-            if "hour" in posted_lower:
-                freshness_score = 1
-            elif "today" in posted_lower or "just" in posted_lower:
-                freshness_score = 2
-            elif "1 day" in posted_lower or "yesterday" in posted_lower:
-                freshness_score = 3
-            elif "2 day" in posted_lower:
-                freshness_score = 4
-            elif "3 day" in posted_lower:
-                freshness_score = 5
-            elif "day" in posted_lower:
-                freshness_score = 10
-            elif "week" in posted_lower:
-                freshness_score = 20
-            
-            # Get apply link
-            apply_options = job.get("apply_options", [])
-            apply_url = apply_options[0].get("link") if apply_options else job.get("share_link")
-            
-            # Get all apply sources
-            apply_sources = [opt.get("title", "Apply") for opt in apply_options[:3]] if apply_options else []
-            
-            # Build highlights from extensions
-            highlights = job.get("job_highlights", [])
-            qualifications = []
-            benefits = []
-            responsibilities = []
-            
-            for highlight in highlights:
-                title = highlight.get("title", "").lower()
-                items = highlight.get("items", [])
-                if "qualif" in title or "require" in title:
-                    qualifications = items[:5]
-                elif "benefit" in title:
-                    benefits = items[:5]
-                elif "responsib" in title or "duties" in title:
-                    responsibilities = items[:3]
-            
-            normalized.append({
-                "id": job.get("job_id", "N/A"),
-                "title": job.get("title", "Unknown Role"),
-                "company": job.get("company_name", "Unknown Company"),
-                "location": job.get("location", loc),
-                "postedDate": posted_at,
-                "freshnessScore": freshness_score,
-                "easyApply": len(apply_options) > 0,
-                "description": job.get("description", "View details.")[:800],
-                "url": apply_url,
-                "logoUrl": job.get("thumbnail"),
-                # Enhanced details
-                "salary": salary,
-                "jobType": job_type,
-                "workFromHome": work_from_home,
-                "applySources": apply_sources,
-                "qualifications": qualifications,
-                "benefits": benefits,
-                "responsibilities": responsibilities,
-                "via": job.get("via", "")
-            })
-        
-        # Sort by freshness (most recent first)
-        normalized.sort(key=lambda x: x["freshnessScore"])
-            
-        return {"data": normalized, "total": len(normalized)}
+        return {"data": final_jobs, "total": len(final_jobs), "pages_fetched": min(3, (len(all_jobs) // 10) + 1)}
         
     except Exception as e:
         print(f"Error fetching jobs from SerpApi: {str(e)}")
