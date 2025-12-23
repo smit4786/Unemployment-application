@@ -1,111 +1,100 @@
 'use client';
 
-import { Box, Typography, Button, Card, CardContent, CardActions } from '@mui/material';
-import NextLink from 'next/link';
-import DescriptionIcon from '@mui/icons-material/Description';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { Typography, Button, Container, Grid, Card, CardContent, Box, Stack, Chip } from '@mui/material';
+import Link from 'next/link';
 
 export default function Home() {
   return (
     <Box>
       {/* Hero Section */}
-      <Box sx={{ 
-        textAlign: 'center', 
-        py: 8, 
-        bgcolor: 'primary.main', 
-        color: 'white',
-        borderRadius: 4,
-        mb: 6,
-        px: 2
-      }}>
-        <Typography variant="h2" gutterBottom>
-          Minnesota Unemployment Insurance
-        </Typography>
-        <Typography variant="h5" sx={{ mb: 4, opacity: 0.9 }}>
-          Temporary partial wage replacement for MN workers
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Button 
-            variant="contained" 
-            color="secondary" 
-            size="large" 
-            component={NextLink} 
-            href="/apply"
-            sx={{ px: 4, py: 1.5, fontSize: '1.1rem' }}
-          >
-            Apply for Benefits
-          </Button>
-          <Button 
-            variant="outlined" 
+      <Box 
+        sx={{ 
+          pt: 12, pb: 12, 
+          textAlign: 'center', 
+          background: 'radial-gradient(circle at 50% 50%, rgba(200, 225, 255, 0.4) 0%, rgba(244, 247, 250, 0) 70%)',
+          mx: -2
+        }}
+      >
+        <Container maxWidth="md">
+          <Chip label="Official MN Service" color="primary" variant="outlined" size="small" sx={{ mb: 2, fontWeight: 600 }} />
+          <Typography variant="h1" gutterBottom sx={{ lineHeight: 1.1, mb: 3 }}>
+             Modern Support for <br/> Minnesota's Workforce
+          </Typography>
+          <Typography variant="h5" color="text.secondary" paragraph sx={{ maxWidth: 600, mx: 'auto', mb: 4 }}>
+            Fast, secure, and reliable unemployment insurance services aimed at getting you back on your feet.
+          </Typography>
+          
+          <Stack direction="row" spacing={2} justifyContent="center" sx={{ mb: 8 }}>
+            <Button variant="contained" size="large" component={Link} href="/eligibility">
+              Check Eligibility
+            </Button>
+            <Button variant="outlined" size="large" component={Link} href="/auth/login">
+              Log In to Account
+            </Button>
+          </Stack>
+
+          {/* Abstract Dashboard Preview */}
+          <Box 
             sx={{ 
-              color: 'white', 
-              borderColor: 'white', 
-              '&:hover': { borderColor: 'grey.300', bgcolor: 'rgba(255,255,255,0.1)' },
-              px: 4, 
-              py: 1.5,
-              fontSize: '1.1rem'
+              height: 300, 
+              width: '100%', 
+              maxWidth: 800,
+              mx: 'auto',
+              bgcolor: 'background.paper',
+              borderRadius: 4,
+              boxShadow: '0 20px 60px -10px rgba(0, 56, 101, 0.15)',
+              border: '1px solid rgba(0,0,0,0.05)',
+              position: 'relative',
+              overflow: 'hidden',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}
-            component={NextLink} 
-            href="/eligibility"
           >
-            Check Eligibility
-          </Button>
-        </Box>
+             <Typography variant="h6" color="primary.light">Interactive Platform Simulation</Typography>
+             {/* Decorative circles */}
+             <Box sx={{ position: 'absolute', top: -50, right: -50, width: 200, height: 200, bgcolor: 'secondary.light', borderRadius: '50%', opacity: 0.1 }} />
+             <Box sx={{ position: 'absolute', bottom: -20, left: -20, width: 150, height: 150, bgcolor: 'primary.main', borderRadius: '50%', opacity: 0.05 }} />
+          </Box>
+        </Container>
       </Box>
 
-      {/* Quick Info Cards */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: { md: '1fr 1fr 1fr' }, gap: 4 }}>
-        <Box>
-          <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <CardContent sx={{ flexGrow: 1, textAlign: 'center' }}>
-              <CheckCircleOutlineIcon color="primary" sx={{ fontSize: 60, mb: 2 }} />
-              <Typography variant="h5" component="div" gutterBottom>
-                Am I Eligible?
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                Review requirements regarding past earnings, reason for separation, and availability to work.
-              </Typography>
-            </CardContent>
-            <CardActions sx={{ justifyContent: 'center', pb: 3 }}>
-              <Button size="small" component={NextLink} href="/eligibility">Use Checker Tool</Button>
-            </CardActions>
-          </Card>
-        </Box>
+      {/* Features Grid */}
+      <Box sx={{ py: 10 }}>
+        <Container maxWidth="lg">
+          <Typography variant="h2" align="center" gutterBottom sx={{ mb: 6 }}>Everything you need</Typography>
+          
+          <Grid container spacing={4}>
+            {[
+              { title: 'Easy Eligibility', desc: 'Determine if you qualify in minutes with our guided wizard.', color: '#003865' },
+              { title: 'Weekly Requests', desc: 'File for benefits weekly with a streamlined, error-free process.', color: '#78BE20' },
+              { title: 'Job Search', desc: 'Find and log job applications directly within the portal.', color: '#336699' }
+            ].map((feature, i) => (
+              <Grid key={i} size={{ xs: 12, md: 4 }}>
+                <Card sx={{ height: '100%', transition: 'transform 0.2s', '&:hover': { transform: 'translateY(-5px)' } }}>
+                  <CardContent sx={{ p: 4, textAlign: 'left' }}>
+                    <Box sx={{ width: 50, height: 50, bgcolor: feature.color, borderRadius: 3, mb: 3, opacity: 0.1 }} />
+                    <Typography variant="h4" gutterBottom>{feature.title}</Typography>
+                    <Typography color="text.secondary">{feature.desc}</Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
 
-        <Box>
-          <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <CardContent sx={{ flexGrow: 1, textAlign: 'center' }}>
-              <DescriptionIcon color="primary" sx={{ fontSize: 60, mb: 2 }} />
-              <Typography variant="h5" component="div" gutterBottom>
-                What You Need
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                Gather your SSN, Driver's License/ID, and employment history for the last 18 months before applying.
-              </Typography>
-            </CardContent>
-            <CardActions sx={{ justifyContent: 'center', pb: 3 }}>
-              <Button size="small" component={NextLink} href="/faq">View Full Checklist</Button>
-            </CardActions>
-          </Card>
-        </Box>
-
-        <Box>
-          <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <CardContent sx={{ flexGrow: 1, textAlign: 'center' }}>
-              <HelpOutlineIcon color="primary" sx={{ fontSize: 60, mb: 2 }} />
-              <Typography variant="h5" component="div" gutterBottom>
-                Help & FAQ
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                Find answers to common questions about weekly requests, benefit amounts, and tax information.
-              </Typography>
-            </CardContent>
-            <CardActions sx={{ justifyContent: 'center', pb: 3 }}>
-              <Button size="small" component={NextLink} href="/faq">Visit Help Center</Button>
-            </CardActions>
-          </Card>
-        </Box>
+      {/* CTA */}
+      <Box sx={{ py: 10, bgcolor: 'primary.main', borderRadius: 4, color: 'white', textAlign: 'center', mb: 4 }}>
+        <Container maxWidth="sm">
+          <Typography variant="h3" gutterBottom color="white">Ready to start?</Typography>
+          <Typography variant="body1" paragraph sx={{ opacity: 0.9, mb: 4 }}>
+             Create an account or log in to manage your benefits.
+          </Typography>
+          <Button variant="contained" size="large" sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' } }} href="/apply">
+            Start Application
+          </Button>
+        </Container>
       </Box>
     </Box>
   );

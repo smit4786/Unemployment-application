@@ -16,23 +16,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
         <ThemeRegistry>
           <AuthProvider>
-            <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-              <NavBar />
-              <Box component="main" sx={{ flexGrow: 1, py: 4 }}>
-                <Container maxWidth="lg">
-                  {children}
-                </Container>
-              </Box>
-              <Box component="footer" sx={{ bgcolor: '#eee', py: 3, mt: 'auto' }}>
-                <Container maxWidth="lg">
-                  <Typography variant="body2" color="text.secondary" align="center">
-                    © {new Date().getFullYear()} Minnesota Unemployment Services Simulation. Not an official government site.
-                  </Typography>
-                </Container>
-              </Box>
+            <NavBar />
+            <Box component="main" sx={{ flexGrow: 1, py: 4, px: 2 }}>
+              <Container maxWidth="lg">
+                {children}
+              </Container>
+            </Box>
+            <Box component="footer" sx={{ bgcolor: 'background.paper', py: 3, mt: 'auto', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+              <Container maxWidth="lg">
+                <Typography variant="body2" color="text.secondary" align="center">
+                  © {new Date().getFullYear()} Minnesota Unemployment Services Simulation. Not an official government site.
+                </Typography>
+              </Container>
             </Box>
           </AuthProvider>
         </ThemeRegistry>

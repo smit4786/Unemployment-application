@@ -54,57 +54,75 @@ function DashboardContent() {
         </Alert>
       </Snackbar>
 
-      <Typography variant="h4" gutterBottom fontWeight="bold" color="primary">
-        My Dashboard
-      </Typography>
+      {/* Hero Welcome */}
+      <Box sx={{ mb: 6, textAlign: 'center', py: 4, background: 'linear-gradient(135deg, rgba(0,56,101,0.05) 0%, rgba(120,190,32,0.1) 100%)', borderRadius: 4 }}>
+        <Typography variant="h4" gutterBottom fontWeight="800" color="primary">
+          Welcome back, {statusData.firstName}
+        </Typography>
+        <Typography variant="subtitle1" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
+          Here is the current status of your benefits and weekly activities.
+        </Typography>
+      </Box>
 
       <Box sx={{ display: 'grid', gridTemplateColumns: { md: '2fr 1fr' }, gap: 4 }}>
         {/* Main Status Tracker */}
         <Box>
-          <Card elevation={3} sx={{ mb: 4 }}>
-             <CardContent>
-               <Typography variant="h6" gutterBottom>Application Status (ID: {statusData.id})</Typography>
-               <Box sx={{ position: 'relative', my: 4, mx: 2 }}>
-                 <LinearProgress variant="determinate" value={statusData.progress} sx={{ height: 10, borderRadius: 5 }} />
-                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                   <Typography variant="caption" fontWeight={statusData.step >= 0 ? "bold" : "normal"} color={statusData.step >= 0 ? "primary" : "text.secondary"}>Submitted</Typography>
-                   <Typography variant="caption" fontWeight={statusData.step >= 1 ? "bold" : "normal"} color={statusData.step >= 1 ? "primary" : "text.secondary"}>Reviewing</Typography>
-                   <Typography variant="caption" fontWeight={statusData.step >= 2 ? "bold" : "normal"} color={statusData.step >= 2 ? "primary" : "text.secondary"}>Determine</Typography>
-                   <Typography variant="caption" fontWeight={statusData.step >= 3 ? "bold" : "normal"} color={statusData.step >= 3 ? "primary" : "text.secondary"}>Paid</Typography>
+          <Card elevation={0} sx={{ mb: 4, border: '1px solid', borderColor: 'divider' }}>
+             <CardContent sx={{ p: 4 }}>
+               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                  <Typography variant="h6" fontWeight="bold">Application Bundle: {statusData.id}</Typography>
+                  <Chip label={statusData.status} color="primary" variant="outlined" />
+               </Box>
+               
+               <Box sx={{ position: 'relative', my: 5, mx: 2 }}>
+                 <LinearProgress variant="determinate" value={statusData.progress} sx={{ height: 12, borderRadius: 6, bgcolor: 'grey.100' }} />
+                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                   {['Submitted', 'Reviewing', 'Determine', 'Paid'].map((stepLabel, index) => (
+                     <Typography 
+                      key={stepLabel}
+                      variant="caption" 
+                      fontWeight={statusData.step >= index ? "bold" : "normal"} 
+                      color={statusData.step >= index ? "primary" : "text.secondary"}
+                     >
+                       {stepLabel}
+                     </Typography>
+                   ))}
                  </Box>
                </Box>
-               <Alert severity="info" icon={<PendingActionsIcon />}>
-                 Your application is currently <strong>{statusData.status}</strong>. Estimated completion: {statusData.estimatedCompletion}.
-               </Alert>
+               
+               <Box sx={{ bgcolor: 'background.default', p: 2, borderRadius: 2, display: 'flex', gap: 2, alignItems: 'center' }}>
+                 <PendingActionsIcon color="action" />
+                 <Typography variant="body2">
+                    Estimated completion: <strong>{statusData.estimatedCompletion}</strong>
+                 </Typography>
+               </Box>
              </CardContent>
           </Card>
 
-          <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>Weekly Activities</Typography>
-          <Box sx={{ display: 'grid', gridTemplateColumns: { sm: '1fr 1fr' }, gap: 2 }}>
+          <Typography variant="h5" gutterBottom fontWeight="bold" sx={{ mt: 4 }}>Action Center</Typography>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { sm: '1fr 1fr' }, gap: 3 }}>
             <Box>
-              <Card variant="outlined">
+              <Card variant="outlined" sx={{ height: '100%', transition: 'all 0.2s', '&:hover': { borderColor: 'primary.main', transform: 'translateY(-2px)' } }}>
                 <CardContent>
-                  <Typography color="text.secondary" gutterBottom>
-                     {searchParams.get('claimFiled') === 'true' ? 'Latest Request' : 'Action Required'}
-                  </Typography>
-                  <Typography variant="h6">Request Benefit Payment</Typography>
-                  <Typography variant="body2" sx={{ mb: 2 }}>For week of {statusData.week}</Typography>
+                  <Typography color="text.secondary" variant="overline" letterSpacing={1}>Weekly Request</Typography>
+                  <Typography variant="h6" gutterBottom fontWeight="bold">Benefit Payment</Typography>
+                  <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>Week of {statusData.week}</Typography>
                   
                   {searchParams.get('claimFiled') === 'true' ? (
-                     <Chip label="Processing" color="info" size="small" icon={<PendingActionsIcon />} />
+                     <Chip label="Processing" color="info" size="small" icon={<PendingActionsIcon />} sx={{ borderRadius: 1 }} />
                   ) : (
-                     <Chip label="Overdue" color="error" size="small" />
+                     <Chip label="Action Required" color="error" size="small" sx={{ borderRadius: 1 }} />
                   )}
                   
                   {/* Only show button if not filed yet */}
                   {searchParams.get('claimFiled') !== 'true' && (
-                     <Box sx={{ mt: 2 }}>
+                     <Box sx={{ mt: 3 }}>
                        <Button 
-                         variant="outlined" 
-                         size="small" 
+                         variant="contained" 
                          fullWidth 
                          component="a" 
                          href="/weekly-request"
+                         disableElevation
                        >
                          Start Request
                        </Button>
@@ -114,69 +132,78 @@ function DashboardContent() {
               </Card>
             </Box>
             <Box>
-              <Card variant="outlined">
+              <Card variant="outlined" sx={{ height: '100%', transition: 'all 0.2s', '&:hover': { borderColor: 'secondary.main', transform: 'translateY(-2px)' } }}>
                  <CardContent>
-                   <Typography color="text.secondary" gutterBottom>Next Step</Typography>
-                   <Typography variant="h6">Submit Work Search</Typography>
-                   <Typography variant="body2" sx={{ mb: 2 }}>Log your job applications</Typography>
-                   <Chip label="Due Friday" color="warning" size="small" />
+                   <Typography color="text.secondary" variant="overline" letterSpacing={1}>Next Task</Typography>
+                   <Typography variant="h6" gutterBottom fontWeight="bold">Work Search</Typography>
+                   <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>Log your job applications</Typography>
+                   <Chip label="Due Friday" color="warning" size="small" variant="outlined" sx={{ borderRadius: 1 }} />
                  </CardContent>
               </Card>
             </Box>
+          </Box>
+          
+          <Box sx={{ mt: 4 }}>
+            <Typography variant="h6" gutterBottom fontWeight="bold">Recent Job Applications</Typography>
+              <Card variant="outlined">
+                {statusData.workLog && statusData.workLog.length > 0 ? (
+                  <List>
+                     {statusData.workLog.map((log: any, i: number) => (
+                        <ListItem key={log.id} divider={i !== statusData.workLog.length - 1}>
+                           <ListItemIcon><WorkIcon color="primary" /></ListItemIcon>
+                           <ListItemText 
+                             primary={<Typography fontWeight="600">{log.jobTitle}</Typography>} 
+                             secondary={`${log.company} • ${log.dateApplied}`} 
+                           />
+                           <Chip label="Applied" size="small" />
+                        </ListItem>
+                     ))}
+                  </List>
+                ) : (
+                  <Box sx={{ p: 4, textAlign: 'center' }}>
+                    <Typography variant="body2" color="text.secondary" gutterBottom>
+                      No applications logged yet.
+                    </Typography>
+                    <Button variant="text" href="/work-search">Find Jobs Now</Button>
+                  </Box>
+                )}
+            </Card>
           </Box>
         </Box>
 
         {/* Gamified Sidebar - Profile Strength */}
         <Box>
-          <Card sx={{ bgcolor: 'secondary.main', color: 'white', mb: 3 }}>
+          <Card sx={{ 
+            bgcolor: 'secondary.main', 
+            color: 'white', 
+            mb: 3, 
+            background: 'linear-gradient(135deg, #78BE20 0%, #5da010 100%)',
+            boxShadow: '0 8px 20px rgba(120, 190, 32, 0.4)'
+          }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom>Profile Strength</Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Box sx={{ position: 'relative', display: 'inline-flex', mr: 2 }}>
-                  <Typography variant="h4" fontWeight="bold">80%</Typography>
-                </Box>
-                <Typography variant="body2">You're almost there! Complete your profile to speed up processing.</Typography>
+              <Typography variant="overline" sx={{ opacity: 0.8 }}>Profile Strength</Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, mt: 1 }}>
+                <Typography variant="h3" fontWeight="bold">80%</Typography>
               </Box>
+              <Typography variant="body2" sx={{ mb: 2, opacity: 0.9 }}>Complete your profile to speed up processing.</Typography>
               <LinearProgress variant="determinate" value={80} sx={{ bgcolor: 'rgba(255,255,255,0.3)', '& .MuiLinearProgress-bar': { bgcolor: 'white' } }} />
             </CardContent>
           </Card>
 
-          <Card variant="outlined" sx={{ mb: 3 }}>
+          <Card variant="outlined" sx={{ bgcolor: 'transparent' }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom>Recent Job Applications</Typography>
-              {statusData.workLog && statusData.workLog.length > 0 ? (
-                <List dense>
-                   {statusData.workLog.map((log: any) => (
-                      <ListItem key={log.id}>
-                         <ListItemIcon><WorkIcon color="primary" /></ListItemIcon>
-                         <ListItemText 
-                           primary={log.jobTitle} 
-                           secondary={`${log.company} • ${log.dateApplied}`} 
-                         />
-                      </ListItem>
-                   ))}
-                </List>
-              ) : (
-                <Typography variant="body2" color="text.secondary">
-                  No applications logged yet.
-                  <br />
-                  <a href="/work-search" style={{ color: '#003865' }}>Find Jobs Now</a>
-                </Typography>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card variant="outlined">
-            <CardContent>
-              <Typography variant="h6" gutterBottom>Recent Notifications</Typography>
-              <List dense>
-                {statusData.notifications.map((notif: any) => (
-                  <ListItem key={notif.id}>
+              <Typography variant="h6" gutterBottom fontWeight="bold">Notifications</Typography>
+              <List dense sx={{ bgcolor: 'background.paper', borderRadius: 3 }}>
+                {statusData.notifications.map((notif: any, i: number) => (
+                  <ListItem key={notif.id} divider={i !== statusData.notifications.length - 1}>
                     <ListItemIcon>
                       {notif.type === 'success' ? <CheckCircleIcon color="success" /> : 
                        notif.type === 'info' ? <ArticleIcon color="primary" /> : <HistoryIcon />}
                     </ListItemIcon>
-                    <ListItemText primary={notif.message} secondary={notif.date} />
+                    <ListItemText 
+                      primary={<Typography variant="body2" fontWeight="500">{notif.message}</Typography>} 
+                      secondary={notif.date} 
+                    />
                   </ListItem>
                 ))}
               </List>
