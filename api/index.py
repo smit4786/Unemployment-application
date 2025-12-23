@@ -48,7 +48,8 @@ def search_jobs(
         "engine": "google_jobs",
         "q": f"{q}{work_type_query} {loc}",
         "hl": "en",
-        "api_key": serpapi_key
+        "api_key": serpapi_key,
+        "lrad": "50"  # 50-mile radius from location
     }
     
     # Date filter chips
