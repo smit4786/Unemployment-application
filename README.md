@@ -38,6 +38,20 @@ A modern, production-ready simulation of the Minnesota Unemployment Insurance ap
 - **Profile Strength**: Gamified dashboard with engagement metrics
 - **Application Logging**: Track all applied jobs with status
 
+### 📋 Job Application Tracker (`/my-applications`)
+
+- **Track All Applications**: Status management (Applied → Following Up → Interviewing → Offer)
+- **Smart Reminders**: Follow-up prompts after 7 days
+- **Contact Management**: Store recruiter/hiring manager details
+- **Notes & History**: Add notes and track application timeline
+
+### ✉️ AI Follow-Up Generator
+
+- **Personalized Emails**: LLM generates follow-up emails based on job description + resume
+- **LinkedIn Messages**: Professional connection messages
+- **One-Click Send**: Opens email client with pre-filled content
+- **Edit Before Sending**: Full control over generated content
+
 ---
 
 ## 🛠️ Tech Stack
@@ -113,16 +127,18 @@ NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_id
 
 The Python FastAPI backend provides:
 
-| Endpoint                 | Method    | Description                      |
-| ------------------------ | --------- | -------------------------------- |
-| `/api/v1/search`         | GET       | Search jobs with filters         |
-| `/api/v1/suggest-jobs`   | GET       | AI-powered job title suggestions |
-| `/api/v1/status`         | GET       | Get application status           |
-| `/api/v1/apply`          | POST      | Submit unemployment application  |
-| `/api/v1/work-log`       | POST      | Log job application activity     |
-| `/api/v1/admin`          | GET/PATCH | Admin portal endpoints           |
-| `/api/v1/ai/chat-assist` | POST      | AI career chat assistance        |
-| `/api/v1/docs`           | GET       | Swagger API documentation        |
+| Endpoint                    | Method    | Description                          |
+| --------------------------- | --------- | ------------------------------------ |
+| `/api/v1/search`            | GET       | Search jobs with filters             |
+| `/api/v1/suggest-jobs`      | GET       | AI-powered job title suggestions     |
+| `/api/v1/generate-followup` | POST      | AI follow-up email/message generator |
+| `/api/v1/find-contact`      | GET       | Contact discovery via SerpApi        |
+| `/api/v1/status`            | GET       | Get application status               |
+| `/api/v1/apply`             | POST      | Submit unemployment application      |
+| `/api/v1/work-log`          | POST      | Log job application activity         |
+| `/api/v1/admin`             | GET/PATCH | Admin portal endpoints               |
+| `/api/v1/ai/chat-assist`    | POST      | AI career chat assistance            |
+| `/api/v1/docs`              | GET       | Swagger API documentation            |
 
 ---
 
@@ -170,11 +186,15 @@ mn-unemployment-platform/
 │   │   ├── apply/        # Application flow
 │   │   ├── dashboard/    # User dashboard
 │   │   ├── eligibility/  # Eligibility checker
+│   │   ├── my-applications/  # Job application tracker
 │   │   ├── work-search/  # Job search page
 │   │   └── ...
 │   ├── components/       # Reusable UI components
-│   └── lib/              # Utilities and services
-├── vercel.json           # Vercel configuration (Python rewrite)
+│   └── lib/
+│       ├── applications.ts  # Application state management
+│       ├── auth.ts          # Authentication
+│       └── linkedin.ts      # Job search utilities
+├── vercel.json           # Vercel configuration
 └── package.json
 ```
 
