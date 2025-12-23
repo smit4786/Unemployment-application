@@ -299,7 +299,7 @@ export default function MyApplicationsPage() {
       </Box>
 
       {/* Main Content */}
-      <Box maxWidth="lg" mx="auto" sx={{ px: 3, mt: -3 }}>
+      <Box maxWidth="lg" mx="auto" sx={{ px: 3, mt: -3, position: 'relative', zIndex: 2 }}>
         {/* Filter Card */}
         <Card sx={{ 
           borderRadius: 3, 
@@ -694,17 +694,26 @@ export default function MyApplicationsPage() {
         onClose={() => { setFollowUpModal(null); setGeneratedEmail(null); setGeneratedLinkedIn(''); }} 
         maxWidth="md" 
         fullWidth
-        PaperProps={{ sx: { borderRadius: 3 } }}
+        PaperProps={{ sx: { borderRadius: 3, overflow: 'hidden' } }}
       >
 
         {followUpModal && (
           <>
-            <DialogTitle sx={{ pb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <DialogTitle sx={{ 
+              pb: 2, 
+              pt: 2.5,
+              px: 3,
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              background: 'linear-gradient(135deg, #003865 0%, #0055a5 100%)',
+              color: 'white'
+            }}>
               <Box>
                 <Typography variant="h5" fontWeight={700}>
                   Follow-Up Assistant
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.8)' }}>
                   Generate personalized messages for {followUpModal.company}
                 </Typography>
               </Box>
