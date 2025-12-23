@@ -27,11 +27,15 @@ Enable direct email sending with resume attachments via Gmail API.
    - Support email: Your email
    - Scopes: `gmail.send`
 4. Application type: **Web application**
-5. Authorized redirect URIs:
+5. **Authorized JavaScript origins**:
+   - `http://localhost:3000` (dev)
+   - `https://unemployment-application.vercel.app` (prod)
+   - `https://your-custom-domain.com` (if using custom domain)
+6. **Authorized redirect URIs**:
    - `http://localhost:3000/api/auth/callback/google` (dev)
-   - `https://your-domain.vercel.app/api/auth/callback/google` (prod)
-6. Click **Create**
-7. Save **Client ID** and **Client Secret**
+   - `https://unemployment-application.vercel.app/api/auth/callback/google` (prod)
+7. Click **Create**
+8. Save **Client ID** and **Client Secret**
 
 ## Step 4: Add Environment Variables
 
