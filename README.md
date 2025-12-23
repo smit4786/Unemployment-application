@@ -68,9 +68,17 @@ NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_id
 
 If these are missing, the application defaults to an in-memory store that resets on server restart.
 
+## LinkedIn Jobs API (Optional)
+
+To enable real job search data instead of mock data, subscribe to the **LinkedIn Jobs Search** API on RapidAPI and add your key:
+
+```env
+NEXT_PUBLIC_RAPIDAPI_KEY=your_rapidapi_key
+```
+
 ## Demo Flow
 
-1.  **Log In**: Use any email/password.
+1.  **Log In**: Use any email/password (or Google Sign-In).
 2.  **Apply**: Complete the application form.
 3.  **Admin**: Go to `/admin` to approve the application.
 4.  **Weekly Request**: Return to Dashboard and file a weekly claim.
