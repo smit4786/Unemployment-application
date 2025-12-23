@@ -47,13 +47,25 @@ A modern, user-friendly simulation of the Minnesota Unemployment Insurance appli
 
 ## Deployment
 
-The easiest way to deploy this Next.js app is to use the [Vercel Platform](https://vercel.com/new).
+### Option 1: Vercel Dashboard (Recommended)
 
 1.  Push code to GitHub (Done!).
 2.  Import the project into Vercel.
 3.  Click **Deploy**.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fhabibshahid2013%2FUnemployment-application)
+
+### Option 2: Command Line
+
+You can also deploy directly from your terminal if you have the Vercel CLI installed:
+
+```bash
+# Deploy a preview
+npm run deploy
+
+# Deploy to production
+npm run deploy:prod
+```
 
 ## Google Cloud / Firebase Setup (Optional)
 
