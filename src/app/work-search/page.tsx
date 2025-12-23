@@ -31,7 +31,7 @@ const POINTS_PER_APPLICATION = 25;
 const WEEKLY_GOAL = 5;
 
 // Industry options
-const INDUSTRIES = [
+export const INDUSTRIES = [
   { value: 'all', label: 'All Industries' },
   { value: 'technology', label: '💻 Technology' },
   { value: 'healthcare', label: '🏥 Healthcare' },
@@ -48,7 +48,7 @@ const INDUSTRIES = [
 ];
 
 // Popular location suggestions (global support via Google Jobs)
-const POPULAR_LOCATIONS = [
+export const POPULAR_LOCATIONS = [
   // Minnesota (default focus)
   'Minnesota, USA',
   'Minneapolis, MN',

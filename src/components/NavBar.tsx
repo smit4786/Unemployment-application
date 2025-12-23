@@ -29,8 +29,8 @@ export default function NavBar() {
 
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
-      <Typography variant="h6" sx={{ my: 2 }}>
-        MN Unemployment
+      <Typography variant="h6" sx={{ my: 2, fontWeight: 700, color: '#003865' }}>
+        NorthStar Works
       </Typography>
       <List>
         {navLinks.filter(link => link.show).map((item) => (
@@ -81,12 +81,25 @@ export default function NavBar() {
              <MenuIcon />
            </IconButton>
 
-           <Box sx={{ 
-             width: 40, height: 40, bgcolor: 'primary.main', borderRadius: '50%', 
-             display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' 
-           }}>mn</Box>
-           <Typography variant="h6" color="primary" fontWeight="800" sx={{ letterSpacing: '-0.5px' }}>
-             Unemployment Insurance
+           <Link href="/" passHref>
+             <Box component="img" src="/logo.png" alt="NorthStar Works" sx={{ width: 40, height: 40 }} />
+           </Link>
+           <Typography 
+             variant="h6" 
+             color="primary" 
+             fontWeight="800" 
+             component={Link} 
+             href="/"
+             sx={{ 
+               letterSpacing: '-0.5px', 
+               textDecoration: 'none',
+               background: 'linear-gradient(135deg, #003865 0%, #78BE20 100%)',
+               WebkitBackgroundClip: 'text',
+               WebkitTextFillColor: 'transparent',
+               display: 'inline-block'
+             }}
+           >
+             NorthStar Works
            </Typography>
         </Box>
 

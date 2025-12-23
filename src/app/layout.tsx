@@ -6,8 +6,8 @@ import { AuthProvider } from "../lib/auth";
 import { AuthProvider as NextAuthProvider } from "../components/AuthProvider";
 
 export const metadata: Metadata = {
-  title: "MN Unemployment Insurance",
-  description: "Apply for unemployment benefits in Minnesota",
+  title: "NorthStar Works | Career & Benefit Services",
+  description: "Minnesota's unified platform for unemployment benefits and career advancement",
 };
 
 export default function RootLayout({

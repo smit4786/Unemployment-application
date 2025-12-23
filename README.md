@@ -1,6 +1,8 @@
-# Minnesota Unemployment Platform
+# NorthStar Works
 
-A modern, production-ready simulation of the Minnesota Unemployment Insurance application process. Features a **Python FastAPI backend** with **real-time job search powered by Google Jobs via SerpApi**, **AI-powered career suggestions**, **Gmail OAuth integration**, and a **gamified job application tracking system**.
+**Navigating Your Career Journey**
+
+NorthStar Works is a modern, unified platform for Minnesota residents to manage unemployment benefits and accelerate their career search. It combines essential safety net services with powerful, AI-driven job search tools. Features a **Python FastAPI backend** with **real-time job search powered by Google Jobs via SerpApi**, **AI-powered career suggestions**, **Gmail OAuth integration**, and a **gamified job application tracking system**.
 
 [View on GitHub](https://github.com/habibshahid2013/Unemployment-application) | [Live Demo](https://unemployment-application.vercel.app)
 
