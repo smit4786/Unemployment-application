@@ -354,9 +354,139 @@ def admin_action(req: AdminAction):
         elif next_step == 3:
              updates.update({"status": "Payment Issued", "progress": 100})
              app['notifications'].append({"id": int(time.time()), "message": "Payment authorized.", "type": "success"})
-             
+        
     store.update(req.id, updates)
     return store.get(req.id)
 
 
+# Job title suggestions with related careers
+JOB_CAREER_MAP = {
+    # Tech
+    "software": ["Software Engineer", "Software Developer", "Full Stack Developer", "Backend Developer", "Frontend Developer", "Web Developer", "Mobile Developer", "DevOps Engineer"],
+    "developer": ["Software Developer", "Web Developer", "Full Stack Developer", "Application Developer", "Junior Developer", "Senior Developer", "Lead Developer"],
+    "engineer": ["Software Engineer", "Data Engineer", "DevOps Engineer", "QA Engineer", "Systems Engineer", "Cloud Engineer", "Machine Learning Engineer"],
+    "data": ["Data Analyst", "Data Scientist", "Data Engineer", "Business Intelligence Analyst", "Analytics Manager", "Database Administrator"],
+    "analyst": ["Data Analyst", "Business Analyst", "Financial Analyst", "Systems Analyst", "Research Analyst", "Operations Analyst"],
+    "product": ["Product Manager", "Product Owner", "Product Designer", "UX Designer", "Project Manager", "Program Manager"],
+    "design": ["UX Designer", "UI Designer", "Graphic Designer", "Product Designer", "Web Designer", "Visual Designer"],
+    "manager": ["Project Manager", "Product Manager", "Account Manager", "Operations Manager", "HR Manager", "Marketing Manager"],
+    
+    # Healthcare
+    "nurse": ["Registered Nurse", "Licensed Practical Nurse", "Nurse Practitioner", "Clinical Nurse", "Travel Nurse", "Home Health Aide"],
+    "medical": ["Medical Assistant", "Medical Technician", "Medical Receptionist", "Phlebotomist", "Lab Technician", "Medical Coder"],
+    "healthcare": ["Healthcare Administrator", "Medical Assistant", "Patient Care Technician", "Health Coach", "Care Coordinator"],
+    
+    # Business
+    "sales": ["Sales Representative", "Account Executive", "Sales Manager", "Business Development", "Inside Sales", "Retail Sales Associate"],
+    "marketing": ["Marketing Manager", "Digital Marketing", "Content Marketing", "Social Media Manager", "SEO Specialist", "Marketing Coordinator"],
+    "finance": ["Financial Analyst", "Accountant", "Bookkeeper", "Financial Advisor", "Tax Preparer", "Auditor"],
+    "accounting": ["Accountant", "Bookkeeper", "Tax Accountant", "Staff Accountant", "Accounts Payable", "Accounts Receivable"],
+    "hr": ["HR Manager", "HR Coordinator", "Recruiter", "Talent Acquisition", "HR Generalist", "Payroll Specialist"],
+    "admin": ["Administrative Assistant", "Office Manager", "Executive Assistant", "Receptionist", "Office Coordinator", "Data Entry"],
+    
+    # Service/Retail
+    "customer": ["Customer Service Rep", "Customer Success Manager", "Call Center Agent", "Client Relations", "Help Desk Support"],
+    "retail": ["Retail Sales Associate", "Store Manager", "Cashier", "Merchandiser", "Stock Associate", "Assistant Manager"],
+    "food": ["Server", "Cook", "Chef", "Kitchen Manager", "Bartender", "Food Service Worker", "Restaurant Manager"],
+    "warehouse": ["Warehouse Associate", "Forklift Operator", "Shipping/Receiving", "Inventory Specialist", "Logistics Coordinator"],
+    "driver": ["Delivery Driver", "CDL Driver", "Truck Driver", "Courier", "Route Driver", "Transport Driver"],
+    
+    # Skilled Trades
+    "electrician": ["Electrician", "Electrical Apprentice", "Maintenance Electrician", "Industrial Electrician"],
+    "mechanic": ["Auto Mechanic", "Diesel Mechanic", "Maintenance Technician", "HVAC Technician"],
+    "construction": ["Construction Worker", "Carpenter", "Plumber", "Welder", "General Laborer", "Superintendent"],
+}
 
+@app.get("/api/v1/suggest-jobs")
+def suggest_jobs(query: str = ""):
+    """Returns AI-powered job title suggestions using Groq LLM"""
+    q = query.strip()
+    
+    if not q:
+        return {
+            "suggestions": ["Software Developer", "Data Analyst", "Project Manager", "Sales Representative", "Administrative Assistant"],
+            "related": ["Customer Service", "Marketing", "Healthcare", "Finance", "Retail"],
+            "alternatives": [],
+            "tip": "Enter a job title or skill to get AI-powered suggestions"
+        }
+    
+    groq_api_key = os.environ.get("GROQ_API_KEY")
+    
+    # Try Groq LLM first
+    if groq_api_key:
+        try:
+            response = requests.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {groq_api_key}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": "llama-3.3-70b-versatile",
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": "You are a career advisor. Given a job title or skill, suggest related job titles. Respond ONLY with a JSON object in this exact format: {\"suggestions\": [\"Job 1\", \"Job 2\", ...], \"related\": [\"Related 1\", \"Related 2\", ...], \"alternatives\": [\"Alt 1\", \"Alt 2\", ...], \"tip\": \"Helpful tip\"}. Suggestions are direct matches, related are similar roles, alternatives are career pivots. Each array should have 5 items max."
+                        },
+                        {
+                            "role": "user",
+                            "content": f"Suggest job titles for someone searching for: {q}"
+                        }
+                    ],
+                    "temperature": 0.7,
+                    "max_tokens": 500
+                },
+                timeout=5
+            )
+            
+            if response.ok:
+                data = response.json()
+                content = data["choices"][0]["message"]["content"]
+                # Parse JSON from response
+                import json
+                # Find JSON in response
+                start = content.find("{")
+                end = content.rfind("}") + 1
+                if start >= 0 and end > start:
+                    result = json.loads(content[start:end])
+                    result["ai_powered"] = True
+                    return result
+        except Exception as e:
+            print(f"Groq API error: {e}")
+    
+    # Fallback to career mapping
+    q_lower = q.lower()
+    suggestions = []
+    related = []
+    
+    for keyword, titles in JOB_CAREER_MAP.items():
+        if keyword in q_lower or q_lower in keyword:
+            suggestions.extend(titles)
+        elif any(q_lower in t.lower() for t in titles):
+            suggestions.extend([t for t in titles if q_lower in t.lower()])
+            related.extend([t for t in titles if q_lower not in t.lower()][:3])
+    
+    # Generate alternatives
+    career_alternatives = []
+    if any(k in q_lower for k in ["tech", "software", "developer", "engineer"]):
+        career_alternatives = ["Product Manager", "Data Analyst", "UX Designer", "Technical Writer", "IT Support"]
+    elif any(k in q_lower for k in ["nurse", "medical", "health"]):
+        career_alternatives = ["Medical Assistant", "Health Coach", "Pharmacy Tech", "Medical Coder", "Healthcare Admin"]
+    elif any(k in q_lower for k in ["sales", "marketing"]):
+        career_alternatives = ["Customer Success", "Account Manager", "Business Development", "Event Coordinator"]
+    elif any(k in q_lower for k in ["admin", "office"]):
+        career_alternatives = ["Project Coordinator", "HR Assistant", "Bookkeeper", "Office Manager"]
+    else:
+        career_alternatives = ["Project Manager", "Customer Service", "Data Entry", "Sales Associate"]
+    
+    # Dedupe
+    seen = set()
+    unique = [s for s in suggestions if not (s.lower() in seen or seen.add(s.lower()))]
+    
+    return {
+        "suggestions": unique[:8],
+        "related": list(set(related))[:5],
+        "alternatives": career_alternatives[:5],
+        "tip": f"Showing jobs related to '{q}'. Add GROQ_API_KEY for AI suggestions!",
+        "ai_powered": False
+    }

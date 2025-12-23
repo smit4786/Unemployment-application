@@ -79,6 +79,11 @@ export default function WorkSearchPage() {
   const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
   const [totalPoints, setTotalPoints] = useState(0);
   const [weeklyApps, setWeeklyApps] = useState(0);
+  
+  // Job title suggestions
+  const [jobSuggestions, setJobSuggestions] = useState<string[]>([]);
+  const [relatedJobs, setRelatedJobs] = useState<string[]>([]);
+  const [alternativeJobs, setAlternativeJobs] = useState<string[]>([]);
 
   useEffect(() => {
     const saved = localStorage.getItem('jobApplications');
@@ -96,6 +101,33 @@ export default function WorkSearchPage() {
       lastUpdated: new Date().toISOString()
     }));
   }, [appliedJobs, totalPoints, weeklyApps]);
+
+  // Fetch AI job suggestions when query changes
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (query.length < 2) {
+        setJobSuggestions([]);
+        setRelatedJobs([]);
+        setAlternativeJobs([]);
+        return;
+      }
+      
+      try {
+        const res = await fetch(`/api/v1/suggest-jobs?query=${encodeURIComponent(query)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setJobSuggestions(data.suggestions || []);
+          setRelatedJobs(data.related || []);
+          setAlternativeJobs(data.alternatives || []);
+        }
+      } catch (err) {
+        console.error('Suggestion fetch failed:', err);
+      }
+    };
+    
+    const debounce = setTimeout(fetchSuggestions, 300);
+    return () => clearTimeout(debounce);
+  }, [query]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -421,6 +453,79 @@ export default function WorkSearchPage() {
               </ToggleButtonGroup>
             </Box>
           </Box>
+
+          {/* AI Job Suggestions */}
+          {(jobSuggestions.length > 0 || relatedJobs.length > 0 || alternativeJobs.length > 0) && (
+            <Box sx={{ mt: 3, p: 2, bgcolor: '#f8fafc', borderRadius: 2, border: '1px solid #e2e8f0' }}>
+              <Typography variant="caption" color="primary" fontWeight="700" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
+                ✨ AI Suggestions
+              </Typography>
+              
+              {jobSuggestions.length > 0 && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                    Try searching for:
+                  </Typography>
+                  <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                    {jobSuggestions.map((s, i) => (
+                      <Chip 
+                        key={i}
+                        label={s}
+                        size="small"
+                        onClick={() => setQuery(s)}
+                        sx={{ 
+                          cursor: 'pointer',
+                          bgcolor: 'white',
+                          border: '1px solid #78BE20',
+                          '&:hover': { bgcolor: '#78BE20', color: 'white' }
+                        }}
+                      />
+                    ))}
+                  </Stack>
+                </Box>
+              )}
+
+              {relatedJobs.length > 0 && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                    Related roles:
+                  </Typography>
+                  <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                    {relatedJobs.map((s, i) => (
+                      <Chip 
+                        key={i}
+                        label={s}
+                        size="small"
+                        variant="outlined"
+                        onClick={() => setQuery(s)}
+                        sx={{ cursor: 'pointer', '&:hover': { bgcolor: '#e3f2fd' } }}
+                      />
+                    ))}
+                  </Stack>
+                </Box>
+              )}
+
+              {alternativeJobs.length > 0 && (
+                <Box>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                    🔄 Career alternatives:
+                  </Typography>
+                  <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
+                    {alternativeJobs.map((s, i) => (
+                      <Chip 
+                        key={i}
+                        label={s}
+                        size="small"
+                        variant="outlined"
+                        onClick={() => setQuery(s)}
+                        sx={{ cursor: 'pointer', borderStyle: 'dashed', '&:hover': { bgcolor: '#fff3e0' } }}
+                      />
+                    ))}
+                  </Stack>
+                </Box>
+              )}
+            </Box>
+          )}
         </form>
       </Card>
 
