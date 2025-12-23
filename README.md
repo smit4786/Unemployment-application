@@ -2,6 +2,8 @@
 
 A modern, user-friendly simulation of the Minnesota Unemployment Insurance application process. This MVP demonstrates a streamlined UX for applying for benefits, checking eligibility, and managing weekly claims.
 
+[View on GitHub](https://github.com/habibshahid2013/Unemployment-application)
+
 ## Key Features
 
 - **Eligibility Checker**: Interactive wizard to help users understand qualification requirements.
@@ -10,6 +12,7 @@ A modern, user-friendly simulation of the Minnesota Unemployment Insurance appli
 - **Weekly Requests**: Guided workflow for certifying weekly eligibility and earnings.
 - **Job Search Integration**: Built-in tool to find and apply for jobs via LinkedIn (Mock Service).
 - **Admin Interface**: `/admin` portal for caseworkers to review and approve applications.
+- **Mobile Friendly**: Fully responsive design with a touch-friendly navigation drawer.
 
 ## Tech Stack
 
@@ -26,7 +29,7 @@ A modern, user-friendly simulation of the Minnesota Unemployment Insurance appli
 1.  **Clone the repository**:
 
     ```bash
-    git clone https://github.com/yourusername/mn-unemployment-platform.git
+    git clone https://github.com/habibshahid2013/Unemployment-application.git
     cd mn-unemployment-platform
     ```
 
@@ -41,6 +44,16 @@ A modern, user-friendly simulation of the Minnesota Unemployment Insurance appli
     npm run dev
     ```
     Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Deployment
+
+The easiest way to deploy this Next.js app is to use the [Vercel Platform](https://vercel.com/new).
+
+1.  Push code to GitHub (Done!).
+2.  Import the project into Vercel.
+3.  Click **Deploy**.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fhabibshahid2013%2FUnemployment-application)
 
 ## Google Cloud / Firebase Setup (Optional)
 

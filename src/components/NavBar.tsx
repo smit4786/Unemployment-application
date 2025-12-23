@@ -1,13 +1,62 @@
 'use client';
 
-import { AppBar, Toolbar, Typography, Container, Box, Button, Chip, Avatar } from "@mui/material";
+import { AppBar, Toolbar, Typography, Button, Box, Avatar, IconButton, Drawer, List, ListItem, ListItemButton, ListItemText, useTheme, useMediaQuery } from "@mui/material";
+import MenuIcon from '@mui/icons-material/Menu';
 import Link from "next/link";
 import { useAuth } from "../lib/auth";
 import { usePathname } from 'next/navigation';
+import { useState } from "react";
 
 export default function NavBar() {
   const { user, logout, isAuthenticated } = useAuth();
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
+  const navLinks = [
+    { label: 'Home', href: '/', show: true },
+    { label: 'Check Eligibility', href: '/eligibility', show: !isAuthenticated },
+    { label: 'Apply Now', href: '/apply', show: !isAuthenticated },
+    { label: 'Dashboard', href: '/dashboard', show: isAuthenticated },
+    { label: 'Request Benefit', href: '/weekly-request', show: isAuthenticated },
+    { label: 'Job Search', href: '/work-search', show: isAuthenticated },
+  ];
+
+  const drawer = (
+    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
+      <Typography variant="h6" sx={{ my: 2 }}>
+        MN Unemployment
+      </Typography>
+      <List>
+        {navLinks.filter(link => link.show).map((item) => (
+          <ListItem key={item.label} disablePadding>
+            <ListItemButton component={Link} href={item.href} sx={{ textAlign: 'center' }}>
+              <ListItemText primary={item.label} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+        {isAuthenticated && (
+           <ListItem disablePadding>
+             <ListItemButton onClick={logout} sx={{ textAlign: 'center', color: 'error.main' }}>
+               <ListItemText primary="Log Out" />
+             </ListItemButton>
+           </ListItem>
+        )}
+        {!isAuthenticated && (
+           <ListItem disablePadding>
+             <ListItemButton component={Link} href="/auth/login" sx={{ textAlign: 'center', color: 'primary.main' }}>
+               <ListItemText primary="Log In" />
+             </ListItemButton>
+           </ListItem>
+        )}
+      </List>
+    </Box>
+  );
 
   return (
     <AppBar 
@@ -22,7 +71,16 @@ export default function NavBar() {
     >
       <Toolbar sx={{ justifyContent: 'space-between', py: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-           {/* Logo Placeholder - simplified text for now */}
+           <IconButton
+             color="inherit"
+             aria-label="open drawer"
+             edge="start"
+             onClick={handleDrawerToggle}
+             sx={{ mr: 2, display: { md: 'none' } }}
+           >
+             <MenuIcon />
+           </IconButton>
+
            <Box sx={{ 
              width: 40, height: 40, bgcolor: 'primary.main', borderRadius: '50%', 
              display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' 
@@ -32,7 +90,8 @@ export default function NavBar() {
            </Typography>
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+        {/* Desktop Menu */}
+        <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, alignItems: 'center' }}>
             <Button 
               color={pathname === '/' ? 'primary' : 'inherit'} 
               component={Link} 
@@ -85,6 +144,23 @@ export default function NavBar() {
             )}
         </Box>
       </Toolbar>
+      
+      <nav>
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          sx={{
+            display: { xs: 'block', md: 'none' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 240 },
+          }}
+        >
+          {drawer}
+        </Drawer>
+      </nav>
     </AppBar>
   );
 }
