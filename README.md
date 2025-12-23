@@ -23,7 +23,10 @@ NorthStar Works is a modern, unified platform for Minnesota residents to manage 
 - **Real-Time Job Search**: Powered by **SerpApi Google Jobs API**
 - **30-50 Jobs Per Search**: Fetches 3 pages of results with pagination
 - **Industry Filter**: Filter by Technology, Healthcare, Finance, Retail, and more
+- **Experience Level Filter**: Filter by Job Level (**Entry, Mid-Level, Senior**)
 - **Smart Filters**: Filter by posting date (Today, 3 Days, Week, Month) and work type (Remote, Hybrid, On-site)
+- **Search Radius**: Configurable search radius (5-100 miles) around your location
+- **Seamless Search Hand-off**: Carry homepage search status (query, filters) directly into the professional dashboard without re-typing
 - **Rich Job Details**: Salary info, qualifications, benefits, responsibilities
 - **Direct Apply Links**: One-click access to original job postings
 - **Company Logos**: Visual job cards with employer branding
