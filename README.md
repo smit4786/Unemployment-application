@@ -100,15 +100,23 @@ NorthStar Works is a modern, unified platform for Minnesota residents to manage 
 
 3. **Set up environment variables** (see Environment Variables section below)
 
-4. **Run Development Server**:
+### Running Locally
+
+1. **Start the Python Backend (Required for Job Search)**
+
    ```bash
+   # Install dependencies
+   pip install -r requirements.txt
+
+   # Run the server (runs on localhost:8000)
+   python api/index.py
+   ```
+
+2. **Start the Frontend**
+   ```bash
+   npm install
    npm run dev
    ```
-   Open [http://localhost:3000](http://localhost:3000)
-
-### Running the Backend Locally
-
-The Python FastAPI backend runs automatically through Vercel's Python runtime. For local development:
 
 ```bash
 # Install Python dependencies

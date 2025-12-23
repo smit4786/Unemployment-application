@@ -47,10 +47,11 @@ def search_jobs(
     
     base_params = {
         "engine": "google_jobs",
-        "q": f"{q}{work_type_query} {loc}",
+        "q": f"{q}{work_type_query}",
+        "location": loc,
         "hl": "en",
         "api_key": serpapi_key,
-        "lrad": radius  # configurable radius from location
+        "lrad": radius  # configurable radius from location (km in SerpApi)
     }
     
     # Date filter chips
@@ -699,3 +700,7 @@ def suggest_jobs(query: str = ""):
         "tip": f"Showing jobs related to '{q}'. Add GROQ_API_KEY for AI suggestions!",
         "ai_powered": False
     }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8000)
