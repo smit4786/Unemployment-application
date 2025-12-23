@@ -58,7 +58,8 @@ export async function searchJobs(
   location: string,
   dateFilter: string = 'week',
   workType: string = 'any',
-  radius: string = '50'
+  radius: string = '50',
+  experienceLevel: string = 'any'
 ): Promise<Job[]> {
   try {
     const params = new URLSearchParams({
@@ -66,7 +67,8 @@ export async function searchJobs(
       location: location.trim(),
       date_filter: dateFilter,
       work_type: workType,
-      radius: radius
+      radius: radius,
+      exp_level: experienceLevel
     });
 
     const response = await fetch(`/api/v1/search?${params.toString()}`);

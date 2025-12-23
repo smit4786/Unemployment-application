@@ -41,6 +41,7 @@ export default function Home() {
   const [workType, setWorkType] = useState('any');
   const [industry, setIndustry] = useState('all');
   const [radius, setRadius] = useState('50');
+  const [experienceLevel, setExperienceLevel] = useState('any');
 
   // AI Suggestions
   const [jobSuggestions, setJobSuggestions] = useState<string[]>([]);
@@ -86,7 +87,7 @@ export default function Home() {
         ? `${query} ${INDUSTRIES.find(i => i.value === industry)?.label.replace(/[^a-zA-Z ]/g, '') || ''}`.trim()
         : query;
         
-      const results = await searchJobs(searchQuery, location, dateFilter, workType, radius);
+      const results = await searchJobs(searchQuery, location, dateFilter, workType, radius, experienceLevel);
       setJobs(results);
     } catch (err) {
       console.error(err);
@@ -104,6 +105,7 @@ export default function Home() {
     if (workType) params.set('w', workType);
     if (industry) params.set('i', industry);
     if (radius) params.set('r', radius);
+    if (experienceLevel) params.set('exp', experienceLevel);
     return `/work-search?${params.toString()}`;
   };
 
@@ -344,6 +346,40 @@ export default function Home() {
                             <MenuItem value="100">100 miles</MenuItem>
                           </Select>
                         </FormControl>
+                      </Box>
+
+                      {/* Experience Level Filter */}
+                      <Box>
+                        <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block', fontWeight: 600 }}>
+                          🎓 Experience
+                        </Typography>
+                        <ToggleButtonGroup
+                          value={experienceLevel}
+                          exclusive
+                          onChange={(e, val) => val && setExperienceLevel(val)}
+                          size="small"
+                          sx={{
+                            '& .MuiToggleButton-root': {
+                              borderRadius: 2,
+                              px: 2,
+                              fontWeight: 600,
+                              textTransform: 'none',
+                              border: '1px solid rgba(0,0,0,0.12)',
+                              '&.Mui-selected': {
+                                background: 'linear-gradient(135deg, #003865 0%, #0055a5 100%)',
+                                color: 'white',
+                                '&:hover': {
+                                  background: 'linear-gradient(135deg, #002a4d 0%, #003865 100%)',
+                                }
+                              }
+                            }
+                          }}
+                        >
+                          <ToggleButton value="any">All</ToggleButton>
+                          <ToggleButton value="entry">Entry</ToggleButton>
+                          <ToggleButton value="mid">Mid</ToggleButton>
+                          <ToggleButton value="senior">Senior</ToggleButton>
+                        </ToggleButtonGroup>
                       </Box>
                     </Box>
 

@@ -22,7 +22,8 @@ def search_jobs(
     location: str = "Minnesota", 
     date_filter: str = "week",  # today, 3days, week, month
     work_type: str = "any",  # remote, hybrid, onsite, any
-    radius: str = "50"  # miles from location
+    radius: str = "50",  # miles from location
+    exp_level: str = "any" # entry, mid, senior, any
 ):
     # SerpApi Google Jobs API
     serpapi_key = os.environ.get("SERPAPI_KEY")
@@ -54,6 +55,9 @@ def search_jobs(
         "lrad": radius  # configurable radius from location (km in SerpApi)
     }
     
+    # Chips for filtering
+    chips = []
+    
     # Date filter chips
     date_chips = {
         "today": "date_posted:today",
@@ -62,7 +66,19 @@ def search_jobs(
         "month": "date_posted:month"
     }
     if date_filter in date_chips:
-        base_params["chips"] = date_chips[date_filter]
+        chips.append(date_chips[date_filter])
+
+    # Experience Level chips
+    exp_chips = {
+        "entry": "requirements:no_experience",
+        "mid": "requirements:years3under",
+        "senior": "requirements:years3plus"
+    }
+    if exp_level in exp_chips:
+        chips.append(exp_chips[exp_level])
+
+    if chips:
+        base_params["chips"] = ",".join(chips)
 
     try:
         all_jobs = []

@@ -101,6 +101,7 @@ function SearchContent() {
   const [workType, setWorkType] = useState(searchParams.get('w') || 'any');
   const [industry, setIndustry] = useState(searchParams.get('i') || 'all');
   const [radius, setRadius] = useState(searchParams.get('r') || '50');
+  const [experienceLevel, setExperienceLevel] = useState(searchParams.get('exp') || 'any');
   
   // Application tracking & rewards
   const [appliedJobs, setAppliedJobs] = useState<string[]>([]);
@@ -129,12 +130,13 @@ function SearchContent() {
       const w = searchParams.get('w') || workType;
       const r = searchParams.get('r') || radius;
       const i = searchParams.get('i') || industry;
+      const exp = searchParams.get('exp') || experienceLevel;
 
       const searchQuery = i !== 'all' 
         ? `${q} ${INDUSTRIES.find(ind => ind.value === i)?.label.replace(/[^a-zA-Z ]/g, '') || ''}`.trim()
         : q;
       
-      const results = await searchJobs(searchQuery, l, d, w, r);
+      const results = await searchJobs(searchQuery, l, d, w, r, exp);
       setJobs(results);
     } catch (err) {
       console.error(err);
@@ -194,7 +196,7 @@ function SearchContent() {
       const searchQuery = industry !== 'all' 
         ? `${query} ${INDUSTRIES.find(i => i.value === industry)?.label.replace(/[^a-zA-Z ]/g, '') || ''}`.trim()
         : query;
-      const results = await searchJobs(searchQuery, location, dateFilter, workType, radius);
+      const results = await searchJobs(searchQuery, location, dateFilter, workType, radius, experienceLevel);
       setJobs(results);
     } catch (err) {
       console.error(err);
@@ -579,6 +581,39 @@ function SearchContent() {
                   <MenuItem value="100">100 miles</MenuItem>
                 </Select>
               </FormControl>
+            </Box>
+
+            {/* Experience Level Filter */}
+            <Box>
+              <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block', fontWeight: 600 }}>
+                🎓 Experience
+              </Typography>
+              <ToggleButtonGroup
+                value={experienceLevel}
+                exclusive
+                onChange={(e, val) => val && setExperienceLevel(val)}
+                size="small"
+                sx={{
+                  '& .MuiToggleButton-root': {
+                    borderRadius: 2,
+                    px: 2,
+                    fontWeight: 600,
+                    textTransform: 'none',
+                    '&.Mui-selected': {
+                      background: 'linear-gradient(135deg, #003865 0%, #0055a5 100%)',
+                      color: 'white',
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, #002a4d 0%, #003865 100%)',
+                      }
+                    }
+                  }
+                }}
+              >
+                <ToggleButton value="any">All</ToggleButton>
+                <ToggleButton value="entry">Entry</ToggleButton>
+                <ToggleButton value="mid">Mid</ToggleButton>
+                <ToggleButton value="senior">Senior</ToggleButton>
+              </ToggleButtonGroup>
             </Box>
 
             {/* My Applications Link */}
