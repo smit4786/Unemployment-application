@@ -817,8 +817,8 @@ function SearchContent() {
                     />
                   )}
 
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2 }}>
-                    <Box sx={{ display: 'flex', gap: 2, flex: 1 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2, flexDirection: { xs: 'column', md: 'row' } }}>
+                    <Box sx={{ display: 'flex', gap: 2, flex: 1, flexDirection: { xs: 'column', sm: 'row' } }}>
                       {/* Company Logo */}
                       {job.logoUrl ? (
                         <Box 
@@ -857,9 +857,7 @@ function SearchContent() {
                           sx={{ 
                             color: '#003865',
                             mb: 0.5,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap'
+                            wordBreak: 'break-word'
                           }}
                         >
                           {job.title}
@@ -926,7 +924,7 @@ function SearchContent() {
                     </Box>
 
                     {/* Action Buttons */}
-                    <Box sx={{ textAlign: 'center', flexShrink: 0 }}>
+                    <Box sx={{ textAlign: 'center', flexShrink: 0, width: { xs: '100%', md: 'auto' }, pt: { xs: 2, md: 0 }, borderTop: { xs: '1px solid #eee', md: 'none' } }}>
                       {!hasApplied && (
                         <Chip 
                           icon={<StarIcon sx={{ color: '#FFD700 !important' }} />}

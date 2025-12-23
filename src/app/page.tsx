@@ -504,9 +504,9 @@ export default function Home() {
                          transition: 'all 0.2s',
                          '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 8px 25px rgba(0,0,0,0.1)' }
                        }}>
-                         <CardContent sx={{ p: 3 }}>
-                           <Box display="flex" justifyContent="space-between" mb={1.5} alignItems="flex-start">
-                              <Typography variant="h6" fontWeight="800" sx={{ lineHeight: 1.3, color: '#003865' }}>{job.title}</Typography>
+                         <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+                           <Box display="flex" justifyContent="space-between" mb={1.5} alignItems="flex-start" gap={1}>
+                              <Typography variant="h6" fontWeight="800" sx={{ lineHeight: 1.3, color: '#003865', wordBreak: 'break-word' }}>{job.title}</Typography>
                               <Chip 
                                 label={style.label} 
                                 size="small" 
@@ -527,13 +527,13 @@ export default function Home() {
                               </Typography>
                            </Box>
 
-                           <Stack direction="row" spacing={1} mb={3} flexWrap="wrap" useFlexGap>
+                           <Stack direction="row" spacing={1} mb={3} flexWrap="wrap" useFlexGap sx={{ gap: 1 }}>
                              {job.salary && <Chip label={job.salary} size="small" color="success" sx={{ bgcolor: '#e8f5e9', color: '#2e7d32', fontWeight: 700 }} />}
                              {job.jobType && <Chip label={job.jobType} size="small" variant="outlined" sx={{ fontWeight: 600 }} />}
                              {job.workFromHome && <Chip label="🏠 Remote" size="small" variant="outlined" sx={{ fontWeight: 600, bgcolor: '#f0f7ff' }} />}
                            </Stack>
 
-                           <Stack direction="row" spacing={2}>
+                           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                              <Button 
                                variant="contained" 
                                fullWidth 
