@@ -121,6 +121,24 @@ def install_node_dependencies():
         print_color("  [✗] Failed to install Node.js dependencies. Try running 'npm install' manually.", "red")
         return False
 
+def check_container_tools():
+    """Checks for Docker and kubectl."""
+    print_color("\n6. Checking container tools (Docker & kubectl)...", "bold")
+    docker_exists = check_command("docker")
+    kubectl_exists = check_command("kubectl")
+    
+    if docker_exists:
+        print_color("  [✓] Docker is installed.", "green")
+    else:
+        print_color("  [!] Docker is not installed. Required for building images.", "yellow")
+        
+    if kubectl_exists:
+        print_color("  [✓] kubectl is installed.", "green")
+    else:
+        print_color("  [!] kubectl is not installed. Required for deployment.", "yellow")
+    
+    return docker_exists and kubectl_exists
+
 def main():
     """Main setup script execution."""
     print_color("--- Starting Project Setup ---", "bold")
@@ -130,7 +148,8 @@ def main():
         check_node_version,
         setup_environment_file,
         install_python_dependencies,
-        install_node_dependencies
+        install_node_dependencies,
+        check_container_tools
     ]
     
     all_successful = all(step() for step in steps)

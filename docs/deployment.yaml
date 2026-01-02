@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unemployment-api
+  labels:
+    app: unemployment-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: unemployment-api
+  template:
+    metadata:
+      labels:
+        app: unemployment-api
+    spec:
+      containers:
+      - name: api
+        # Ensure you build this image: docker buildx build --load -t unemployment-api:latest ./api
+        image: unemployment-api:latest
+        imagePullPolicy: Never # Uses local image for Minikube
+        ports:
+        - containerPort: 8000
+        env:
+        - name: SERPAPI_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-secrets
+              key: serpapi-key
+        - name: GROQ_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: api-secrets
+              key: groq-api-key
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: unemployment-api-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: unemployment-api
+  ports:
+    - port: 80
+      targetPort: 8000
