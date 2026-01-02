@@ -1,7 +1,16 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
+import io
+import json
 import os
+import time
+from typing import Any, Dict, List, Optional
+
+import firebase_admin
+import requests
+from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from firebase_admin import firestore
 from pydantic import BaseModel
+from pypdf import PdfReader
 
 app = FastAPI(docs_url="/api/v1/docs", openapi_url="/api/v1/openapi.json")
 # Allow CORS for development logic
@@ -12,9 +21,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-import requests
-from typing import Optional
 
 @app.get("/api/v1/search")
 def search_jobs(
@@ -213,17 +219,15 @@ def search_jobs(
     }
 
 
-# Initialize Firebase Admin
-import firebase_admin
-from firebase_admin import credentials, firestore
-
 try:
     if not firebase_admin._apps:
         # Attempts to load default credentials (works on Vercel if env vars are set)
         firebase_admin.initialize_app()
     db = firestore.client()
 except Exception as e:
-    print(f"Firebase Admin Init Warning: {e}")
+    print(f"WARNING: Firebase Admin failed to initialize. Database features will be disabled.")
+    print(f"Reason: {e}")
+    print("Ensure GOOGLE_APPLICATION_CREDENTIALS is set or you are in a GCP environment.")
     db = None
 
 # --- Application Submission Endpoint ---
@@ -265,9 +269,6 @@ class FollowUpRequest(BaseModel):
     resumeText: Optional[str] = None
     contactName: Optional[str] = None
     contactEmail: Optional[str] = None
-
-import io
-from pypdf import PdfReader
 
 @app.post("/api/v1/parse-resume")
 async def parse_resume(file: UploadFile = File(...)):
@@ -378,7 +379,6 @@ Only output the JSON, nothing else."""
             content = data["choices"][0]["message"]["content"]
             
             # Parse JSON from response
-            import json
             start = content.find("{")
             end = content.rfind("}") + 1
             if start >= 0 and end > start:
@@ -476,9 +476,6 @@ def ai_chat_assist(req: ChatRequest):
 
 
 # --- In-Memory Store Logic ---
-import time
-from typing import List, Dict, Any
-
 class ApplicationModel(BaseModel):
     id: str
     firstName: str
@@ -676,7 +673,6 @@ def suggest_jobs(query: str = ""):
                 data = response.json()
                 content = data["choices"][0]["message"]["content"]
                 # Parse JSON from response
-                import json
                 # Find JSON in response
                 start = content.find("{")
                 end = content.rfind("}") + 1
